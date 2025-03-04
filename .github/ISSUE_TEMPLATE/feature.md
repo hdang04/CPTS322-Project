@@ -16,12 +16,14 @@ assignees: hdang04
 ### Acceptance Criteria 
 
 ```
+Scenario:
 Given
 When
 Then
 ```
 
 ```
+Scenario:
 Given
 When
 Then
