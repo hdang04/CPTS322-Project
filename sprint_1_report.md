@@ -18,7 +18,8 @@ Here are links to the issues that we completed in this sprint:
  ## Incomplete Issues/User Stories
  Here are issues we worked on but did not complete in this sprint:
  
- * https://github.com/hdang04/CPTS322-Project/issues/9  << This feature is subject to change as development continues because the user interface may change drastically as features are added or removed. Additionally, decisions around the UI may change as the application progresses. >> 
+ * https://github.com/hdang04/CPTS322-Project/issues/9
+This feature is subject to change as development continues because the user interface may change drastically as features are added or removed. Additionally, decisions around the UI may change as the application progresses. 
 
 ## Code Files for Review
 Please review the following code files, which were actively developed during this sprint, for quality:
