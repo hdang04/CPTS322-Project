@@ -1,5 +1,5 @@
 # Sprint 1 Report 
-Video Link: 
+Video Link: https://youtu.be/SNOEESGaJys
 ## What's New (User Facing)
  * Basic User Interface Set Up
  * Adding Items to a Cart
