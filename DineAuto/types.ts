@@ -10,3 +10,17 @@ export type CartItem = {
     id: number;
     quantity: number;
 }
+
+export type Order = {
+    id: number;
+    cust_id: number;
+    items: CartItem[];
+    placed: string;
+    status: string;
+}
+
+export type User = {
+    id: string;
+    name: string;
+    role: string;
+}
