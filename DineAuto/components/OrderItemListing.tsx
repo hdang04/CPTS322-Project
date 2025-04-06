@@ -1,15 +1,11 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
-import {useContext} from 'react';
 import { CartItem } from '@/types';
-import { CartContext } from '../components/CartProvider'
-import Button from './Button';
 
-type CartListingProps = {
+type OrderItemListingProps = {
   cartItem: CartItem;  
 };
 
-const CartListing = ({ cartItem }: CartListingProps) => {
-    const {updateQuantity} = useContext(CartContext);
+const OrderItemListing = ({ cartItem }: OrderItemListingProps) => {
   return (
     <View style={styles.container}>
       <Image
@@ -23,10 +19,8 @@ const CartListing = ({ cartItem }: CartListingProps) => {
           <Text style={styles.price}>${(cartItem.item.price * cartItem.quantity).toFixed(2)}</Text>
         </View>
       </View>
-      <View style={styles.quantitySelector}>
-        <Button onPress={()=> updateQuantity(cartItem.item.id, -1)} text="-" />
-        <Text style={styles.quantity}>{cartItem.quantity}</Text>
-        <Button onPress={()=> updateQuantity(cartItem.item.id, 1)} text="+" />
+      <View style={styles.quantity}>
+        <Text style={{fontSize: 18, fontWeight: 'bold'}}>{cartItem.quantity}</Text>
       </View>
     </View>
   );
@@ -61,15 +55,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 5,
   },
-  quantitySelector: {
+  quantity: {
     flexDirection: 'row',
     gap: 15,
     alignItems: 'center',
     marginLeft: 'auto',
-  },
-  quantity: {
-    fontWeight: '500',
-    fontSize: 18,
+    marginHorizontal: 20,
   },
   price: {
     color: 'grey',
@@ -77,4 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CartListing;
+export default OrderItemListing;
