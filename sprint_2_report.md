@@ -21,9 +21,9 @@ Here are links to the issues that we completed in this sprint:
 
 ## Code Files for Review
 Please review the following code files, which were actively developed during this sprint, for quality:
- * [app](https://github.com/hdang04/CPTS322-Project/tree/225725eaf733492f1ee0e20c6c3db39e07555966/DineAuto/app)
- * [components](https://github.com/hdang04/CPTS322-Project/tree/225725eaf733492f1ee0e20c6c3db39e07555966/DineAuto/components)
- * [utils](https://github.com/hdang04/CPTS322-Project/tree/225725eaf733492f1ee0e20c6c3db39e07555966/DineAuto/utils)
+ * [app](https://github.com/hdang04/CPTS322-Project/tree/main/DineAuto/app)
+ * [components](https://github.com/hdang04/CPTS322-Project/tree/main/DineAuto/components)
+ * [utils](https://github.com/hdang04/CPTS322-Project/tree/main/DineAuto/utils)
  
 ## Retrospective Summary
 Here's what went well:
