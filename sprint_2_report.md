@@ -1,5 +1,5 @@
 # Sprint 2 Report 
-Video Link: 
+Video Link: https://youtu.be/ZNuJJ-YqbVE
 ## What's New (User Facing)
  * Cart displays more information
  * Menu now updates off of a database
