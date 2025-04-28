@@ -14,7 +14,11 @@ export default function TabLayout() {
   const {session, isAdmin} = useContext(AuthContext)
 
   if (!session) {
-    return <Redirect href={'/'}/>
+    return <Redirect href={'/signIn'}/>
+  }
+
+  if (isAdmin) {
+    return <Redirect href={'/(admin)'}/>
   }
 
   return (

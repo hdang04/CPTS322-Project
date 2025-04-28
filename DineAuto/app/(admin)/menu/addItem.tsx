@@ -8,26 +8,85 @@ import { Redirect, router, Stack, useLocalSearchParams } from 'expo-router'
 import { supabase } from '@/utils/supabase'
 import { Item } from '@/types'
 
-
 const addItemScreen = () => {
     const [name, setName] = useState('')
     const [price, setPrice] = useState('')
     const [desc, setDesc] = useState('')
-    const [image, setImage] = useState<string | null>(null)
     const [items, setItems] = useState<Item[]>([])
     const [loading, setLoading] = useState(true)
-    
-
+    const [image, setImage] = useState< ImagePicker.ImagePickerAsset| null>(null);  
+  
     useEffect(() => {
         const getMenuItems = async () => {
-            const {data} = await supabase.from('menu_item').select('*')
-            setItems(data || []) 
-            setLoading(false)
-        }
-        
-        getMenuItems() 
-
-    }, []) 
+          const { data, error } = await supabase.from('menu_item').select('*');
+          if (error) {
+            console.error('Error fetching menu items:', error.message);
+            setLoading(false);
+            return;
+          }
+          setItems(data as Item[]);
+          setLoading(false);
+        };
+      
+        getMenuItems();
+      
+        const setupRealtime = async () => {
+          const channel = supabase
+            .channel('menu-item-changes')
+            .on(
+              'postgres_changes',
+              {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'menu_item',
+              },
+              (payload) => {
+                console.log('New menu item added:', payload.new);
+                setItems((prev) => [...prev, payload.new as Item]);
+              }
+            )
+            .on(
+              'postgres_changes',
+              {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'menu_item',
+              },
+              (payload) => {
+                console.log('Menu item updated:', payload.new);
+                setItems((prev) =>
+                  prev.map((item) =>
+                    item.id === (payload.new as Item).id ? { ...item, ...(payload.new as Item) } : item
+                  )
+                );
+              }
+            )
+            .on(
+              'postgres_changes',
+              {
+                event: 'DELETE',
+                schema: 'public',
+                table: 'menu_item',
+              },
+              (payload) => {
+                console.log('Menu item deleted:', payload.old);
+                setItems((prev) => prev.filter((item) => item.id !== (payload.old as Item).id));
+              }
+            );
+      
+          await channel.subscribe();
+          
+          return () => {
+            supabase.removeChannel(channel);
+          };
+        };
+      
+        const cleanupPromise = setupRealtime();
+      
+        return () => {
+          cleanupPromise.then((cleanup) => cleanup?.());
+        };
+      }, []);
 
     const { id } = useLocalSearchParams()
     const item = items.find((p) => p.id.toString() == id )
@@ -37,7 +96,7 @@ const addItemScreen = () => {
         if (existsOnMenu) {
             setName(item?.name || '')
             setPrice(item?.price.toString() || '')
-            setImage(item?.image || '')
+            //setImage(item?.image || null)
         }
     }, [existsOnMenu, item])
 
@@ -69,29 +128,53 @@ const addItemScreen = () => {
         if (!validateInput()) return
 
         try {
-            const insertMenuItem = async () => {
+          const insertMenuItem = async () => {
+
+              if (image){
+                const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer())
+                const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg'
+                const path = `${Date.now()}.${fileExt}`
+                const { data, error } = await supabase.storage.from('menu-images').upload(path, arraybuffer, {
+                  contentType: image.mimeType ?? 'image/jpeg',
+                });
+                if (error){
+                  console.log(error)
+                  throw error
+                }
+                const { data: urlData } = supabase.storage.from('menu-images').getPublicUrl(data.path)
+                console.log(urlData.publicUrl)
                 await supabase.from('menu_item').insert({
-                    image: image,
-                    name: name,
-                    price: parseFloat(price),
-                
-                }).single()
-            }
-    
-            insertMenuItem()
-            setName('')
-            setPrice('')
-            setDesc('')
-            setImage(null)
+                  image: urlData.publicUrl,
+                  name: name,
+                  price: parseFloat(price),
+              
+              }).single()
+              }
+              
+              else {
+                await supabase.from('menu_item').insert({
+                  image: null,
+                  name: name,
+                  price: parseFloat(price),
+              
+              }).single()
+              }
+          }
+  
+          insertMenuItem()
+          setName('')
+          setPrice('')
+          setDesc('')
+          setImage(null)
 
-            router.replace('/(admin)')
+          router.back()
+          router.replace('/(admin)/menu')
 
-        }
-        catch (error) {
+      }
+      catch (error) {
 
-        }
+      }
 
-       
     }
 
     const updateItem = () => {
@@ -100,12 +183,36 @@ const addItemScreen = () => {
 
         try {
             const updateMenuItem = async () => {
-                await supabase.from('menu_item').update({
-                    image: image,
+
+                if (image){
+                  const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer())
+                  const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg'
+                  const path = `${Date.now()}.${fileExt}`
+                  const { data, error } = await supabase.storage.from('menu-images').upload(path, arraybuffer, {
+                    contentType: image.mimeType ?? 'image/jpeg',
+                  });
+                  if (error){
+                    console.log(error)
+                    throw error
+                  }
+                  const { data: urlData } = supabase.storage.from('menu-images').getPublicUrl(data.path)
+                  console.log(urlData.publicUrl)
+                  await supabase.from('menu_item').update({
+                    image: urlData.publicUrl,
                     name: name,
                     price: parseFloat(price),
                 
                 }).eq('id', item?.id).single()
+                }
+                
+                else {
+                  await supabase.from('menu_item').update({
+                    image: null,
+                    name: name,
+                    price: parseFloat(price),
+                
+                }).eq('id', item?.id).single()
+                }
             }
     
             updateMenuItem()
@@ -114,7 +221,8 @@ const addItemScreen = () => {
             setDesc('')
             setImage(null)
 
-            router.replace('/(admin)')
+            router.back()
+            router.replace('/(admin)/menu')
 
         }
         catch (error) {
@@ -127,12 +235,14 @@ const addItemScreen = () => {
 
         try {
             const deleteMenuItem = async () => {
-                await supabase.from('menu_item').delete().eq('id', item?.id).single()
+                await supabase.from('menu_item').delete().eq('id', item?.id)
             }
     
             deleteMenuItem()
+
+            router.back()
+            router.replace('/(admin)/menu')
             
-            router.replace('/(admin)')
         }
         catch (error) {
 
@@ -154,7 +264,7 @@ const addItemScreen = () => {
         });
         
         if (!result.canceled) {
-          setImage(result.assets[0].uri);
+          setImage(result.assets[0]);
         }
       };
 
@@ -165,7 +275,7 @@ const addItemScreen = () => {
     return (
         <KeyboardAwareScrollView style={styles.container}>
             <Stack.Screen options={{title: existsOnMenu ? `Remove or Update ${item?.name}` : 'Add Item to Menu'}}/>
-            <Image source={image ? {uri : image} : require('@/assets/images/placeholder.jpg')} 
+            <Image source={image?.uri ? {uri : image.uri} : require('@/assets/images/placeholder.jpg')} 
             style={styles.image}/>
             <Text onPress={pickImage} style={styles.selectButton}>Choose an image</Text>
 
@@ -182,7 +292,8 @@ const addItemScreen = () => {
             placeholder='Description' style={styles.input} multiline={true}/> 
 
             <Button onPress={existsOnMenu ? updateItem : addItem} text={existsOnMenu ? 'Update' : 'Add to menu'}/>
-            {existsOnMenu && <Button onPress={confirmRemove} text='Remove'/>}
+            {/* on press should be confirm remove; changing for demo */}
+            {existsOnMenu && <Button onPress={removeItem} text='Remove'/>}
         </KeyboardAwareScrollView>
     )
 }

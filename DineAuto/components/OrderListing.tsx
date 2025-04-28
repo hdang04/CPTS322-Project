@@ -3,15 +3,23 @@ import {useContext} from 'react';
 import { Order } from '../types';
 import Button from './Button';
 import { Link } from 'expo-router';
+import { AuthContext } from './AuthProvider';
 
 type OrderListingProps = {
     order: Order;
 }
 
 const OrderListing = ( { order }: OrderListingProps) => {
+    const {isAdmin} = useContext(AuthContext)
+    let isDisabled = false
+
+    if (!isAdmin) {
+      isDisabled = true
+    }
+
     return (
       <Link href={`/(admin)/orders/${order.id}`} asChild>
-        <Pressable style={styles.container}>
+        <Pressable style={styles.container} disabled={isDisabled}>
         <View>
           <Text style={styles.title}>Order {order.id}</Text>
           <View>

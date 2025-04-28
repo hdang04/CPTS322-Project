@@ -14,7 +14,6 @@ const signInScreen = () => {
     
     async function guestSignIn() {
         const { error } = await supabase.auth.signInAnonymously()
-        
     }
     
     async function accSignIn() {

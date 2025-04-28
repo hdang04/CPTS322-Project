@@ -9,7 +9,7 @@ const OrderItemListing = ({ cartItem }: OrderItemListingProps) => {
   return (
     <View style={styles.container}>
       <Image
-        source={cartItem.item.image || require('../assets/images/placeholder.jpg')}
+        source={cartItem.item.image ? {uri : cartItem.item.image} : require('@/assets/images/placeholder.jpg')}
         style={styles.image}
         resizeMode="contain"
       />
