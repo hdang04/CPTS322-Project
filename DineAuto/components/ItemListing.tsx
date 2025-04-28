@@ -11,7 +11,7 @@ const ItemListing = ({ item }: ItemListingProp) => {
       <Link href={`/menu/${item.id}`} asChild>
         <Pressable style={styles.container}>
           <Image 
-          source={require('../assets/images/placeholder.jpg')}
+          source={item.image ? {uri : item.image} : require('@/assets/images/placeholder.jpg')}
           style={styles.image}
           resizeMode="contain">
             
@@ -47,6 +47,8 @@ const styles = StyleSheet.create({
       width: '100%',
       height: '100%',
       aspectRatio: 1,
+      padding: 10,
+      borderRadius: 20,
     },
   });
   

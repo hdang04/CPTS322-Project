@@ -6,7 +6,7 @@ import CartListing from '@/components/CartListing';
 import Button from '@/components/Button';
 
 export default function CartScreen() {
-  const { items, subtotal } = useContext(CartContext);
+  const { items, subtotal, checkOut } = useContext(CartContext);
   return (
     <View style={{padding: 10, flex: 1}}>
 
@@ -29,7 +29,7 @@ export default function CartScreen() {
         <Text style={styles.total}>${(subtotal * 1.08).toFixed(2)}</Text>
       </View>
 
-      <Button onPress={() => console.log(items)} text="Checkout" />
+      <Button onPress={checkOut} text="Checkout" />
     </View>
   );
 }

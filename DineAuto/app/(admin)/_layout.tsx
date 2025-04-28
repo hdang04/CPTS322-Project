@@ -1,23 +1,27 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Redirect, Tabs } from 'expo-router';
+import { Redirect, Tabs, useRouter } from 'expo-router';
 
 import Colors from '@/constants/Colors';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { AuthContext } from '@/components/AuthProvider';
 
 export default function TabLayout() {
-  const {isAdmin} = useContext(AuthContext)
-   
+  const { session, isAdmin} = useContext(AuthContext);
+
+  if (!session) {
+    return <Redirect href={'/signIn'}/>
+  }
+
   if (!isAdmin) {
-    return <Redirect href={'/'}/>
+    return <Redirect href={'/(user)'}/>
   }
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.light.tint,
+        tabBarActiveTintColor: 'hotpink',
         headerShown: useClientOnlyValue(false, true),
         tabBarStyle: {
           backgroundColor: 'pink'
@@ -39,7 +43,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <FontAwesome name="list-ul" size={22} color={color} />,
         }}
       />
-      <Tabs.Screen name="index" options={{href: null}}>
+      <Tabs.Screen 
+        name="index" 
+        options={{
+          title: 'Sign Out', 
+          headerShown: false,
+          tabBarIcon: ({ color }) => <FontAwesome name="user-circle-o" size={22} color={color} />,
+        }}>
       
       </Tabs.Screen>
     </Tabs>
