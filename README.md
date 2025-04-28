@@ -25,7 +25,7 @@ To get started with this project:
 
 ## Features
 
-- User registration/loging
+- User registration/login
 - Menu viewing
 - Adding items to a cart
 - Placing orders
